@@ -2,6 +2,8 @@
 import streamlit as st
 from openai import OpenAI
 import os
+import requests
+from io import BytesIO
 
 # Get your OpenAI API key from environment variables
 api_key = os.getenv("OPENAI_API_KEY")
@@ -52,5 +54,17 @@ if make_it_button:
         thumbnail_url = generate_image(description_input, merch_type)
         if thumbnail_url:
             st.image(thumbnail_url, caption=f'🤩 Your Custom {merch_type} Idea!')
+            
+            # Download the image
+            response = requests.get(thumbnail_url)
+            img_data = BytesIO(response.content)
+            
+            # Add a download button
+            st.download_button(
+                label="Download Image",
+                data=img_data,
+                file_name="custom_merch_image.png",
+                mime="image/png"
+            )
         else:
             st.error("Failed to generate image. Please try again.")
